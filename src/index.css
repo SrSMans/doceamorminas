@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-pink: #FFC0CB;
+  --color-turquoise: #40E0D0;
+  --color-chocolate: #7B3F00;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--color-chocolate);
+}
+
+.accent-text {
+  background: linear-gradient(120deg, var(--color-pink), var(--color-turquoise));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
