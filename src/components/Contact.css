@@ -1,0 +1,59 @@
+.floating-heart {
+  position: absolute;
+  bottom: -20px;
+  background-color: rgba(255, 105, 180, 0.7);
+  width: 15px;
+  height: 15px;
+  transform: rotate(45deg);
+  pointer-events: none;
+  z-index: 1;
+  filter: drop-shadow(0 0 3px rgba(255, 105, 180, 0.4));
+}
+
+.floating-heart::before,
+.floating-heart::after {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background-color: rgba(255, 105, 180, 0.7);
+  border-radius: 50%;
+}
+
+.floating-heart::before {
+  top: -7.5px;
+  left: 0;
+}
+
+.floating-heart::after {
+  top: 0;
+  left: -7.5px;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) rotate(45deg) scale(1);
+    opacity: 0.8;
+  }
+  30% {
+    opacity: 0.6;
+  }
+  60% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-40vh) rotate(45deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+.hearts-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40vh; /* Limita a altura para 40% da tela */
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}

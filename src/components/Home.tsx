@@ -5,6 +5,10 @@ export function Home() {
   // Estado para controlar o efeito de partículas
   const [particles, setParticles] = React.useState([]);
   
+  // Estado para controlar a palavra que muda na frase
+  const [currentWord, setCurrentWord] = React.useState(0);
+  const changingWords = ["doces memórias", "sabores inesquecíveis", "experiências mágicas", "alegrias deliciosas"];
+  
   // Efeito para criar e animar as partículas
   React.useEffect(() => {
     const createParticle = () => ({
@@ -41,9 +45,9 @@ export function Home() {
   
   // Array com as URLs das imagens do carrossel
   const heroImages = [
-    'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1612203985729-70726954388c?auto=format&fit=crop&q=80',
+    'https://static.itdg.com.br/images/auto-auto/0812d896211493fcb70c2a0454c138ba/macarons-1.jpg',
+    'https://tudosobrebrigadeirogourmet.com/wp-content/uploads/2016/11/13-receitas-de-brigadeiros-gourmet-faceis.webp',
+    'https://cdn0.casamentos.com.br/article-real-wedding/855/3_2/960/jpg/1960095.jpeg',
     'https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&q=80'
   ];
   
@@ -55,6 +59,15 @@ export function Home() {
     
     return () => clearInterval(interval);
   }, [heroImages.length]);
+  
+  // Efeito para alternar as palavras automaticamente
+  React.useEffect(() => {
+    const wordInterval = setInterval(() => {
+      setCurrentWord((prev) => (prev + 1) % changingWords.length);
+    }, 3000); // Troca a cada 3 segundos
+    
+    return () => clearInterval(wordInterval);
+  }, [changingWords.length]);
   
   React.useEffect(() => {
     const handleScroll = () => {
@@ -161,7 +174,8 @@ export function Home() {
               Doce Amor Minas
             </h1>
             <p className="text-2xl text-gray-700 mb-8">
-              Transformamos momentos especiais em doces memórias
+              Transformamos momentos especiais em<br />
+              <span className="changing-word">{changingWords[currentWord]}</span>
             </p>
             <button
               onClick={() => {

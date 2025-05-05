@@ -9,7 +9,7 @@ export function Menu() {
     "Brigadeiros Especiais",
     "Bombons",
     "Trufas",
-    "Sobremesas Finais"
+    "Sobremesas Finas"
   ];
 
   const productsByCategory = categories.reduce((acc, category) => {
@@ -31,7 +31,7 @@ export function Menu() {
     <div className="bg-white min-h-screen">
       {/* Hero Section */}
       <div className="relative h-[400px] bg-gradient-to-b from-pink-100 to-white overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1587248720327-8eb72564be1e?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-20"></div>
+        <div className="absolute inset-0 bg-[url('https://static.wixstatic.com/media/8024f8_0a8fc3fb5403423a8239b4122c8adfcb~mv2.png/v1/fill/w_568,h_368,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/8024f8_0a8fc3fb5403423a8239b4122c8adfcb~mv2.png')] bg-cover bg-center opacity-20"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
         <div className="max-w-7xl mx-auto px-8 h-full flex items-center justify-center">
           <div className="text-center relative z-0">
@@ -48,7 +48,8 @@ export function Menu() {
       {/* Categories Navigation */}
       <div className="sticky top-0 bg-white shadow-md z-20">
         <div className="max-w-7xl mx-auto px-8 py-6">
-          <div className="flex flex-wrap justify-center gap-6">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex flex-wrap justify-center gap-6">
             {categories.map((category) => (
               <button
                 key={category}
@@ -58,6 +59,27 @@ export function Menu() {
                 {category}
               </button>
             ))}
+          </div>
+          
+          {/* Mobile Dropdown */}
+          <div className="md:hidden relative">
+            <select 
+              onChange={(e) => scrollToCategory(e.target.value)}
+              className="w-full px-4 py-3 rounded-lg text-pink-600 bg-white border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-300 appearance-none"
+              defaultValue=""
+            >
+              <option value="" disabled>Selecione uma categoria</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg className="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
           </div>
         </div>
       </div>

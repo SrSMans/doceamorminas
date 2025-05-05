@@ -32,11 +32,11 @@ export function About() {
           </div>
           <div className="relative">
             <div className="aspect-square rounded-full overflow-hidden shadow-xl">
-              <div className="w-full h-full bg-pink-100 flex items-center justify-center">
-                <svg className="w-32 h-32 text-pink-300" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                </svg>
-              </div>
+              <img 
+                src="https://i.imgur.com/XjnxZcg.png" 
+                alt="Angela Nascimento Laureth"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="absolute -bottom-4 right-4 bg-pink-500 text-white py-2 px-4 rounded-full shadow-lg">
               Especialista em Confeitaria
