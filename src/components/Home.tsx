@@ -49,6 +49,9 @@ export function Home() {
   // Estados para controlar o swipe/arrasto
   const [touchStart, setTouchStart] = React.useState(0);
   const [touchEnd, setTouchEnd] = React.useState(0);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [dragOffset, setDragOffset] = React.useState(0);
+  const autoPlayIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
   React.useEffect(() => {
     const update = () => {
       const w = window.innerWidth;
@@ -60,38 +63,65 @@ export function Home() {
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
   }, []);
-  React.useEffect(() => {
+  // Função para resetar o timer automático
+  const resetAutoPlay = React.useCallback(() => {
+    if (autoPlayIntervalRef.current) {
+      clearInterval(autoPlayIntervalRef.current);
+    }
     if (featured.length > 0) {
-      const interval = setInterval(() => {
+      autoPlayIntervalRef.current = setInterval(() => {
         setStartIndex((i) => (i + 1) % featured.length);
       }, 5000);
-      return () => clearInterval(interval);
     }
   }, [featured.length]);
+
+  React.useEffect(() => {
+    resetAutoPlay();
+    return () => {
+      if (autoPlayIntervalRef.current) {
+        clearInterval(autoPlayIntervalRef.current);
+      }
+    };
+  }, [featured.length, resetAutoPlay]);
   
-  // Funções para detectar swipe
+  // Funções para detectar swipe com efeito visual
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
+    setTouchEnd(e.targetTouches[0].clientX);
+    setIsDragging(true);
   };
   
   const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    if (!isDragging) return;
+    const currentTouch = e.targetTouches[0].clientX;
+    setTouchEnd(currentTouch);
+    // Calcula o offset do arrasto para criar o efeito visual
+    const offset = currentTouch - touchStart;
+    setDragOffset(offset);
   };
   
   const handleTouchEnd = () => {
-    if (touchStart - touchEnd > 75) {
-      // Swipe para a esquerda - avançar
-      if (featured.length > 0) {
-        setStartIndex((i) => (i + 1) % featured.length);
+    setIsDragging(false);
+    const swipeDistance = touchStart - touchEnd;
+    
+    if (Math.abs(swipeDistance) > 75) {
+      if (swipeDistance > 0) {
+        // Swipe para a esquerda - avançar
+        if (featured.length > 0) {
+          setStartIndex((i) => (i + 1) % featured.length);
+        }
+      } else {
+        // Swipe para a direita - voltar
+        if (featured.length > 0) {
+          setStartIndex((i) => (i - 1 + featured.length) % featured.length);
+        }
       }
+      // Reseta o timer após mudança manual
+      resetAutoPlay();
     }
     
-    if (touchStart - touchEnd < -75) {
-      // Swipe para a direita - voltar
-      if (featured.length > 0) {
-        setStartIndex((i) => (i - 1 + featured.length) % featured.length);
-      }
-    }
+    // Reseta o offset com animação
+    setDragOffset(0);
   };
   // Estado para controlar a imagem atual do carrossel
   const [currentImage, setCurrentImage] = React.useState(0);
@@ -303,7 +333,11 @@ export function Home() {
             {featured.length > 0 && (
               <div
                 className="grid gap-6 sm:gap-8 swipe-container"
-                style={{ gridTemplateColumns: `repeat(${Math.min(itemsPerView, featured.length)}, minmax(0, 1fr))` }}
+                style={{ 
+                  gridTemplateColumns: `repeat(${Math.min(itemsPerView, featured.length)}, minmax(0, 1fr))`,
+                  transform: `translateX(${dragOffset}px)`,
+                  transition: isDragging ? 'none' : 'transform 0.3s ease-out'
+                }}
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
@@ -348,7 +382,10 @@ export function Home() {
                 <button
                   key={i}
                   className={`w-3 h-3 rounded-full transition-all ${startIndex % featured.length === i ? 'bg-pink-500 w-6' : 'bg-pink-300'}`}
-                  onClick={() => setStartIndex(i)}
+                  onClick={() => {
+                    setStartIndex(i);
+                    resetAutoPlay();
+                  }}
                   aria-label={`Ir para destaque ${i + 1}`}
                 />
               ))}
@@ -356,7 +393,12 @@ export function Home() {
             <div className="absolute inset-y-0 left-0 items-center hidden md:flex">
               <button
                 className="bg-white/80 hover:bg-white text-pink-600 rounded-full p-2 shadow"
-                onClick={() => featured.length > 0 && setStartIndex((i) => (i - 1 + featured.length) % featured.length)}
+                onClick={() => {
+                  if (featured.length > 0) {
+                    setStartIndex((i) => (i - 1 + featured.length) % featured.length);
+                    resetAutoPlay();
+                  }
+                }}
                 aria-label="Anterior"
               >
                 ‹
@@ -365,7 +407,12 @@ export function Home() {
             <div className="absolute inset-y-0 right-0 items-center hidden md:flex">
               <button
                 className="bg-white/80 hover:bg-white text-pink-600 rounded-full p-2 shadow"
-                onClick={() => featured.length > 0 && setStartIndex((i) => (i + 1) % featured.length)}
+                onClick={() => {
+                  if (featured.length > 0) {
+                    setStartIndex((i) => (i + 1) % featured.length);
+                    resetAutoPlay();
+                  }
+                }}
                 aria-label="Próximo"
               >
                 ›
