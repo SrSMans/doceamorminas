@@ -258,8 +258,8 @@ className="w-full h-full object-cover transition-all duration-700 group-hover:sc
                       {/* Title - above description when visible, moves down when hidden on mobile */}
                       <h3 className={`text-lg sm:text-xl md:text-2xl font-semibold text-white mb-2 sm:mb-3 transition-all duration-500 order-1 ${
                         activeProduct === product._id 
-                          ? 'transform translate-y-0 text-shadow-lg' 
-                          : 'md:transform md:translate-y-2 transform translate-y-4'
+                          ? 'transform translate-y-16 text-shadow-lg' 
+                          : 'md:transform md:translate-y-2 transform translate-y-0'
                       }`} style={{
                         textShadow: activeProduct === product._id 
                           ? '0 0 30px rgba(255, 255, 255, 0.8), 0 0 60px rgba(236, 72, 153, 0.6)' 
