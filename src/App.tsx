@@ -19,10 +19,24 @@ export default function App() {
     const trackVisit = async () => {
       try {
         const convexUrl = import.meta.env.VITE_CONVEX_URL as string;
-        const httpUrl = convexUrl.replace('https://', 'https://').replace('.convex.cloud', '.convex.site');
-        await fetch(`${httpUrl}/trackVisit`, {
+        // Converte de https://nome.convex.cloud para https://nome.convex.site
+        const httpUrl = convexUrl.replace('.convex.cloud', '.convex.site');
+        const fullUrl = `${httpUrl}/trackVisit`;
+        
+        console.log('Tentando registrar visita em:', fullUrl);
+        
+        const response = await fetch(fullUrl, {
           method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
+        
+        if (response.ok) {
+          console.log('Visita registrada com sucesso!');
+        } else {
+          console.error('Erro ao registrar visita:', response.status, response.statusText);
+        }
       } catch (error) {
         console.error('Erro ao registrar visita:', error);
       }
