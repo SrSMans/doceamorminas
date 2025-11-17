@@ -371,38 +371,76 @@ export function Home() {
         <div className="max-w-7xl mx-auto px-8">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-pink-600 text-center mb-8 sm:mb-12">Nossos Destaques</h2>
           
-          {/* Desktop: Grid tradicional */}
+          {/* Desktop: Grid tradicional com rotação */}
           <div className="hidden lg:block">
             {featured.length > 0 && (
-              <div className="grid grid-cols-4 gap-8">
-                {featured.slice(0, 4).map((item) => (
-                  <div
-                    key={item._id}
-                    className="group cursor-pointer rounded-2xl overflow-hidden shadow-lg hover:-translate-y-1 hover:shadow-2xl transition-all"
-                    onClick={() => {
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                      const event = new CustomEvent("setPage", { detail: "CARDAPIO" });
-                      window.dispatchEvent(event);
-                    }}
-                  >
-                    <div className="relative aspect-[4/5]">
-                      <img
-                        src={
-                          item.imageUrl ||
-                          "https://images.unsplash.com/photo-1582716401301-b2407dc7563d?auto=format&fit=crop&q=80"
-                        }
-                        alt={item.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-black/10 to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
-                        <h3 className="text-xl sm:text-2xl font-semibold text-white drop-shadow-md">
-                          {item.name}
-                        </h3>
+              <div className="relative">
+                <div className="grid grid-cols-4 gap-8">
+                  {Array.from({ length: 4 }).map((_, k) => {
+                    const item = featured[(startIndex + k) % featured.length];
+                    return (
+                      <div
+                        key={`${startIndex}-${k}`}
+                        className="group cursor-pointer rounded-2xl overflow-hidden shadow-lg hover:-translate-y-1 hover:shadow-2xl transition-all"
+                        onClick={() => {
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                          const event = new CustomEvent("setPage", { detail: "CARDAPIO" });
+                          window.dispatchEvent(event);
+                        }}
+                      >
+                        <div className="relative aspect-[4/5]">
+                          <img
+                            src={
+                              item.imageUrl ||
+                              "https://images.unsplash.com/photo-1582716401301-b2407dc7563d?auto=format&fit=crop&q=80"
+                            }
+                            alt={item.name}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-black/10 to-transparent" />
+                          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
+                            <h3 className="text-xl sm:text-2xl font-semibold text-white drop-shadow-md">
+                              {item.name}
+                            </h3>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })}
+                </div>
+                {/* Botões de navegação desktop */}
+                <div className="absolute inset-y-0 -left-4 flex items-center">
+                  <button
+                    className="bg-white/80 hover:bg-white text-pink-600 rounded-full p-3 shadow-lg hover:shadow-xl transition-all"
+                    onClick={() => {
+                      if (featured.length > 0) {
+                        setStartIndex((i) => (i - 1 + featured.length) % featured.length);
+                        resetAutoPlay();
+                      }
+                    }}
+                    aria-label="Anterior"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                </div>
+                <div className="absolute inset-y-0 -right-4 flex items-center">
+                  <button
+                    className="bg-white/80 hover:bg-white text-pink-600 rounded-full p-3 shadow-lg hover:shadow-xl transition-all"
+                    onClick={() => {
+                      if (featured.length > 0) {
+                        setStartIndex((i) => (i + 1) % featured.length);
+                        resetAutoPlay();
+                      }
+                    }}
+                    aria-label="Próximo"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -467,7 +505,8 @@ export function Home() {
                 </div>
               </div>
             )}
-            <div className="mt-6 flex items-center justify-center gap-3 lg:hidden">
+            {/* Indicadores para ambos desktop e mobile */}
+            <div className="mt-6 flex items-center justify-center gap-3">
               {featured.map((_, i) => (
                 <button
                   key={i}
