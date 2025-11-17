@@ -53,9 +53,13 @@ export function Home() {
   const [isDragging, setIsDragging] = React.useState(false);
   const [dragOffset, setDragOffset] = React.useState(0);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
+  const [animType, setAnimType] = React.useState<'none' | 'auto' | 'manual'>('none');
+  const [animDirection, setAnimDirection] = React.useState<'left' | 'right' | null>(null);
   const autoPlayIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
   const carouselRef = React.useRef<HTMLDivElement>(null);
+  const innerRef = React.useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = React.useState(0);
+  const [slideStep, setSlideStep] = React.useState(0);
   React.useEffect(() => {
     const update = () => {
       const w = window.innerWidth;
@@ -72,6 +76,14 @@ export function Home() {
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
   }, []);
+  // Avanço automático com animação
+  const autoAdvance = React.useCallback(() => {
+    if (isDragging || animType !== 'none' || !slideStep) return;
+    setAnimType('auto');
+    setAnimDirection('left');
+    setDragOffset(-slideStep);
+  }, [isDragging, animType, slideStep]);
+
   // Função para resetar o timer automático
   const resetAutoPlay = React.useCallback(() => {
     if (autoPlayIntervalRef.current) {
@@ -79,10 +91,10 @@ export function Home() {
     }
     if (featured.length > 0) {
       autoPlayIntervalRef.current = setInterval(() => {
-        setStartIndex((i) => (i + 1) % featured.length);
+        autoAdvance();
       }, 5000);
     }
-  }, [featured.length]);
+  }, [featured.length, autoAdvance]);
 
   React.useEffect(() => {
     resetAutoPlay();
@@ -92,9 +104,33 @@ export function Home() {
       }
     };
   }, [featured.length, resetAutoPlay]);
+
+  // Mede o passo real do slide (inclui gap entre itens)
+  React.useEffect(() => {
+    const measure = () => {
+      if (!innerRef.current) return;
+      const el = innerRef.current;
+      const children = el.children;
+      if (children.length >= 2) {
+        const a = (children[0] as HTMLElement).getBoundingClientRect();
+        const b = (children[1] as HTMLElement).getBoundingClientRect();
+        setSlideStep(Math.abs(b.left - a.left));
+      } else if (children.length === 1) {
+        setSlideStep((children[0] as HTMLElement).getBoundingClientRect().width);
+      }
+    };
+    requestAnimationFrame(measure);
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [itemsPerView, featured.length]);
   
   // Funções para detectar swipe com efeito visual
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Pausa o autoplay enquanto o usuário interage
+    if (autoPlayIntervalRef.current) {
+      clearInterval(autoPlayIntervalRef.current);
+      autoPlayIntervalRef.current = null;
+    }
     setTouchStart(e.targetTouches[0].clientX);
     setTouchEnd(e.targetTouches[0].clientX);
     setIsDragging(true);
@@ -104,54 +140,48 @@ export function Home() {
     if (!isDragging) return;
     const currentTouch = e.targetTouches[0].clientX;
     setTouchEnd(currentTouch);
-    // Calcula o offset do arrasto para criar o efeito visual
+    // Offset relativo ao início do toque
     const offset = currentTouch - touchStart;
     setDragOffset(offset);
   };
   
   const handleTouchEnd = () => {
     setIsDragging(false);
-    const swipeDistance = touchStart - touchEnd;
-    const threshold = containerWidth * 0.25; // 25% da largura do container
-    
-    // Se passou do threshold, muda de card
-    if (Math.abs(swipeDistance) > threshold) {
-      setIsTransitioning(true);
-      
-      if (swipeDistance > 0) {
-        // Swipe para a esquerda - avançar
-        setDragOffset(-containerWidth);
-        
-        setTimeout(() => {
-          if (featured.length > 0) {
-            setStartIndex((i) => (i + 1) % featured.length);
-          }
-          setDragOffset(0);
-          setIsTransitioning(false);
-        }, 400);
+    const delta = touchEnd - touchStart;
+    const threshold = Math.max(40, slideStep * 0.25);
+
+    if (Math.abs(delta) >= threshold && slideStep) {
+      setAnimType('manual');
+      if (delta < 0) {
+        setAnimDirection('left');
+        setDragOffset(-slideStep);
       } else {
-        // Swipe para a direita - voltar
-        setDragOffset(containerWidth);
-        
-        setTimeout(() => {
-          if (featured.length > 0) {
-            setStartIndex((i) => (i - 1 + featured.length) % featured.length);
-          }
-          setDragOffset(0);
-          setIsTransitioning(false);
-        }, 400);
+        setAnimDirection('right');
+        setDragOffset(slideStep);
       }
-      // Reseta o timer após mudança manual
-      resetAutoPlay();
     } else {
-      // Se não passou do threshold, volta suavemente para a posição original
-      setIsTransitioning(true);
+      // Volta para posição inicial suavemente
       setDragOffset(0);
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 300);
     }
   };
+  // Finaliza animações (manual/auto) ao término da transição
+  const handleTransitionEnd = () => {
+    if (animType === 'none') return;
+    if (animDirection === 'left') {
+      if (featured.length > 0) {
+        setStartIndex((i) => (i + 1) % featured.length);
+      }
+    } else if (animDirection === 'right') {
+      if (featured.length > 0) {
+        setStartIndex((i) => (i - 1 + featured.length) % featured.length);
+      }
+    }
+    setDragOffset(0);
+    setAnimType('none');
+    setAnimDirection(null);
+    resetAutoPlay();
+  };
+
   // Estado para controlar a imagem atual do carrossel
   const [currentImage, setCurrentImage] = React.useState(0);
   
@@ -452,9 +482,11 @@ export function Home() {
                 >
                   <div
                     className="flex gap-6 sm:gap-8"
+                    ref={innerRef}
+                    onTransitionEnd={handleTransitionEnd}
                     style={{ 
-                      transform: `translateX(calc(-${containerWidth / itemsPerView + (itemsPerView === 1 ? 0 : 16)}px + ${dragOffset}px))`,
-                      transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                      transform: `translateX(calc(-${slideStep}px + ${dragOffset}px))`,
+                      transition: isDragging ? 'none' : 'transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1)'
                     }}
                   >
                     {/* Renderiza cards extras para o efeito de peek */}

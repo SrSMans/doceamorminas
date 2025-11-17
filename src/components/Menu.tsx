@@ -1,7 +1,6 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useState, useEffect } from "react";
-import ClickSpark from './ClickSpark';
 
 export function Menu() {
   const products = useQuery(api.products.list) || [];
@@ -89,13 +88,6 @@ export function Menu() {
   };
 
   return (
-    <ClickSpark
-      sparkColor='#dd7ffa'
-      sparkSize={10}
-      sparkRadius={15}
-      sparkCount={8}
-      duration={400}
-    >
     <div className="bg-white min-h-screen">
       {isActiveNow && showAnnouncement && (
         <div
@@ -344,6 +336,5 @@ className="w-full h-full object-cover transition-all duration-700 group-hover:sc
         </svg>
       </button>
     </div>
-    </ClickSpark>
   );
 }
