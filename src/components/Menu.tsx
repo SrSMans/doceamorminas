@@ -243,22 +243,9 @@ className="w-full h-full object-cover transition-all duration-700 group-hover:sc
                     />
                     
                     {/* Content container with enhanced animations */}
-                    <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 via-black/50 to-transparent">
-                      {/* Title - above description when visible, moves down when hidden on mobile */}
-                      <h3 className={`text-lg sm:text-xl md:text-2xl font-semibold text-white mb-2 sm:mb-3 transition-all duration-500 ${
-                        activeProduct === product._id 
-                          ? 'transform translate-y-0 text-shadow-lg' 
-                          : 'md:transform md:translate-y-2 transform translate-y-16'
-                      }`} style={{
-                        textShadow: activeProduct === product._id 
-                          ? '0 0 30px rgba(255, 255, 255, 0.8), 0 0 60px rgba(236, 72, 153, 0.6)' 
-                          : '2px 2px 4px rgba(0, 0, 0, 0.8)'
-                      }}>
-                        {product.name}
-                      </h3>
-                      
+                    <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 via-black/50 to-transparent flex flex-col">
                       {/* Description - ALWAYS visible on mobile, disappears with zoom in on click */}
-                      <div className={`overflow-hidden transition-all duration-500 ease-out ${
+                      <div className={`overflow-hidden transition-all duration-500 ease-out order-2 ${
                         activeProduct === product._id 
                           ? 'md:max-h-40 md:opacity-100 md:transform md:translate-y-0 max-h-40 opacity-0 scale-110' 
                           : 'md:max-h-0 md:opacity-0 md:transform md:translate-y-4 max-h-40 opacity-100 scale-100'
@@ -267,6 +254,19 @@ className="w-full h-full object-cover transition-all duration-700 group-hover:sc
                           {product.description}
                         </p>
                       </div>
+                      
+                      {/* Title - above description when visible, moves down when hidden on mobile */}
+                      <h3 className={`text-lg sm:text-xl md:text-2xl font-semibold text-white mb-2 sm:mb-3 transition-all duration-500 order-1 ${
+                        activeProduct === product._id 
+                          ? 'transform translate-y-0 text-shadow-lg' 
+                          : 'md:transform md:translate-y-2 transform -translate-y-16'
+                      }`} style={{
+                        textShadow: activeProduct === product._id 
+                          ? '0 0 30px rgba(255, 255, 255, 0.8), 0 0 60px rgba(236, 72, 153, 0.6)' 
+                          : '2px 2px 4px rgba(0, 0, 0, 0.8)'
+                      }}>
+                        {product.name}
+                      </h3>
                       
                       {/* Decorative line animation */}
                       <div className={`absolute bottom-0 left-8 right-8 h-0.5 bg-pink-400 transition-all duration-700 ${
