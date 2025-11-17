@@ -257,11 +257,11 @@ className="w-full h-full object-cover transition-all duration-700 group-hover:sc
                         {product.name}
                       </h3>
                       
-                      {/* Description - ALWAYS visible on mobile, with zoom effect */}
+                      {/* Description - ALWAYS visible on mobile, disappears with zoom in on click */}
                       <div className={`overflow-hidden transition-all duration-500 ease-out ${
                         activeProduct === product._id 
-                          ? 'md:max-h-40 md:opacity-100 md:transform md:translate-y-0 scale-100 opacity-100 max-h-40' 
-                          : 'md:max-h-0 md:opacity-0 md:transform md:translate-y-4 md:scale-100 scale-95 opacity-0 max-h-0'
+                          ? 'md:max-h-40 md:opacity-100 md:transform md:translate-y-0 max-h-40 opacity-0 scale-110' 
+                          : 'md:max-h-0 md:opacity-0 md:transform md:translate-y-4 max-h-40 opacity-100 scale-100'
                       }`}>
                         <p className="text-white/90 text-sm sm:text-base md:text-lg leading-relaxed backdrop-blur-sm bg-black/20 rounded-lg p-2 sm:p-3">
                           {product.description}
@@ -270,7 +270,7 @@ className="w-full h-full object-cover transition-all duration-700 group-hover:sc
                       
                       {/* Decorative line animation */}
                       <div className={`absolute bottom-0 left-8 right-8 h-0.5 bg-pink-400 transition-all duration-700 ${
-                        activeProduct === product._id ? 'md:opacity-100 md:scale-x-100 opacity-100 scale-x-100' : 'md:opacity-0 md:scale-x-0 opacity-100 scale-x-100'
+                        activeProduct === product._id ? 'md:opacity-100 md:scale-x-100 opacity-0' : 'md:opacity-0 md:scale-x-0 opacity-100'
                       }`}></div>
                     </div>
                   </div>
