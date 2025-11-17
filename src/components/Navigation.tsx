@@ -5,24 +5,35 @@ interface NavigationProps {
 }
 
 export function Navigation({ currentPage, setCurrentPage }: NavigationProps) {
-  const pages = ["INICIO", "CARDAPIO", "SOBRE NÓS", "CONTATO"];
+  const pageDisplayNames = ["INÍCIO", "CARDÁPIO", "SOBRE NÓS", "CONTATO"];
+  const pageIds = ["INICIO", "CARDAPIO", "SOBRE NÓS", "CONTATO"];
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const getPageId = (displayName: string) => {
+    const index = pageDisplayNames.indexOf(displayName);
+    return index !== -1 ? pageIds[index] : displayName;
+  };
+
+  const getDisplayName = (pageId: string) => {
+    const index = pageIds.indexOf(pageId);
+    return index !== -1 ? pageDisplayNames[index] : pageId;
+  };
 
   return (
     <div className="relative">
       {/* Menu tradicional para desktop */}
       <nav className="hidden md:flex gap-6 fixed top-6 right-8 z-40">
-        {pages.map((page) => (
+        {pageDisplayNames.map((displayName) => (
           <button
-            key={page}
-            onClick={() => setCurrentPage(page)}
+            key={displayName}
+            onClick={() => setCurrentPage(getPageId(displayName))}
             className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ease-in-out ${
-              currentPage === page
+              getPageId(displayName) === currentPage
                 ? "bg-pink-600 text-white shadow-md"
                 : "text-gray-500 hover:text-pink-600 hover:bg-pink-50"
             }`}
           >
-            {page}
+            {displayName}
           </button>
         ))}
       </nav>
@@ -41,20 +52,20 @@ export function Navigation({ currentPage, setCurrentPage }: NavigationProps) {
         {/* Menu suspenso */}
         {menuOpen && (
           <div className="absolute right-0 mt-3 w-44 bg-white rounded-xl shadow-2xl border border-pink-100 flex flex-col items-end py-2 animate-fade-in z-50">
-            {pages.map((page) => (
+            {pageDisplayNames.map((displayName) => (
               <button
-                key={page}
+                key={displayName}
                 onClick={() => {
-                  setCurrentPage(page);
+                  setCurrentPage(getPageId(displayName));
                   setMenuOpen(false);
                 }}
                 className={`w-full text-right px-6 py-3 text-base font-medium transition-all duration-200 ${
-                  currentPage === page
+                  getPageId(displayName) === currentPage
                     ? "bg-pink-600 text-white"
                     : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
                 }`}
               >
-                {page}
+                {displayName}
               </button>
             ))}
           </div>

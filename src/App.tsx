@@ -24,10 +24,22 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (currentPage === "CARDAPIO" || currentPage === "INICIO") {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+  }, [currentPage]);
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <header className="sticky top-0 z-10 bg-gradient-to-b from-pink-50 to-white p-6 flex justify-between items-center border-b border-pink-100 shadow-sm">
-        <h2 className="text-3xl text-pink-600" style={{ fontFamily: 'Pacifico' }}>Doce Amor Minas</h2>
+      <header className="sticky top-0 z-30 bg-gradient-to-b from-pink-50 to-white p-6 flex justify-between items-center border-b border-pink-100 shadow-sm">
+        <h2 className="text-3xl text-pink-600 cursor-pointer" style={{ fontFamily: 'Pacifico' }} onClick={() => {
+          if (currentPage === "INICIO") {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          } else {
+            setCurrentPage("INICIO");
+          }
+        }}>Doce Amor Minas</h2>
         <Navigation currentPage={currentPage} setCurrentPage={setCurrentPage} />
         <SignOutButton />
       </header>

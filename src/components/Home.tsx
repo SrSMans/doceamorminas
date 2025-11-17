@@ -1,9 +1,15 @@
 import React from 'react';
 import './Home.css';
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 export function Home() {
   // Estado para controlar o efeito de partículas
   const [particles, setParticles] = React.useState([]);
+  
+  // Estado para controlar a palavra que muda na frase
+  const [currentWord, setCurrentWord] = React.useState(0);
+  const changingWords = ["doces memórias", "sabores inesquecíveis", "experiências mágicas", "alegrias deliciosas"];
   
   // Efeito para criar e animar as partículas
   React.useEffect(() => {
@@ -36,14 +42,36 @@ export function Home() {
     const animationInterval = setInterval(animateParticles, 50);
     return () => clearInterval(animationInterval);
   }, []);
+  const featured = useQuery(api.products.listByCategory, { category: 'DESTAQUES' }) || [];
+  const [itemsPerView, setItemsPerView] = React.useState(4);
+  const [startIndex, setStartIndex] = React.useState(0);
+  React.useEffect(() => {
+    const update = () => {
+      const w = window.innerWidth;
+      if (w < 640) setItemsPerView(1);
+      else if (w < 1024) setItemsPerView(2);
+      else setItemsPerView(4);
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+  React.useEffect(() => {
+    if (featured.length > 0) {
+      const interval = setInterval(() => {
+        setStartIndex((i) => (i + 1) % featured.length);
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [featured.length]);
   // Estado para controlar a imagem atual do carrossel
   const [currentImage, setCurrentImage] = React.useState(0);
   
   // Array com as URLs das imagens do carrossel
   const heroImages = [
-    'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1612203985729-70726954388c?auto=format&fit=crop&q=80',
+    'https://static.itdg.com.br/images/auto-auto/0812d896211493fcb70c2a0454c138ba/macarons-1.jpg',
+    'https://tudosobrebrigadeirogourmet.com/wp-content/uploads/2016/11/13-receitas-de-brigadeiros-gourmet-faceis.webp',
+    'https://cdn0.casamentos.com.br/article-real-wedding/855/3_2/960/jpg/1960095.jpeg',
     'https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&q=80'
   ];
   
@@ -55,6 +83,15 @@ export function Home() {
     
     return () => clearInterval(interval);
   }, [heroImages.length]);
+  
+  // Efeito para alternar as palavras automaticamente
+  React.useEffect(() => {
+    const wordInterval = setInterval(() => {
+      setCurrentWord((prev) => (prev + 1) % changingWords.length);
+    }, 3000); // Troca a cada 3 segundos
+    
+    return () => clearInterval(wordInterval);
+  }, [changingWords.length]);
   
   React.useEffect(() => {
     const handleScroll = () => {
@@ -108,11 +145,28 @@ export function Home() {
       </div>
     );
   };
+
+  // Depoimentos dos clientes vindos do Convex
+  const testimonials = useQuery(api.testimonials.list, {}) || [];
+
+  // Índice do primeiro depoimento sendo exibido
+  const [testimonialStartIndex, setTestimonialStartIndex] = React.useState(0);
+
+  // Rotação automática dos depoimentos a cada 7 segundos
+  React.useEffect(() => {
+    if (!testimonials || testimonials.length === 0) return;
+
+    const interval = setInterval(() => {
+      setTestimonialStartIndex((prev) => (prev + 1) % testimonials.length);
+    }, 7000);
+
+    return () => clearInterval(interval);
+  }, [testimonials?.length]);
   
   return (
     <div className="relative">
       {/* Hero Section with Parallax Effect and Image Carousel */}
-      <div className="relative h-[600px] overflow-hidden">
+      <div className="relative h-[500px] sm:h-[600px] overflow-hidden">
         {/* Camada de fundo sólida para evitar que o fundo rosa apareça */}
         <div className="absolute inset-0 bg-white"></div>
         
@@ -157,11 +211,12 @@ export function Home() {
         
         <div className="max-w-7xl mx-auto px-8 h-full flex items-center">
           <div className="relative z-1 max-w-2xl">
-            <h1 className="text-7xl font-normal text-pink-600 mb-6" style={{ fontFamily: 'Croissant One' }}>
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-normal text-pink-600 mb-6" style={{ fontFamily: 'Croissant One' }}>
               Doce Amor Minas
             </h1>
             <p className="text-2xl text-gray-700 mb-8">
-              Transformamos momentos especiais em doces memórias
+              Transformamos momentos especiais em<br />
+              <span className="changing-word">{changingWords[currentWord]}</span>
             </p>
             <button
               onClick={() => {
@@ -169,7 +224,7 @@ export function Home() {
                 const event = new CustomEvent('setPage', { detail: 'CARDAPIO' });
                 window.dispatchEvent(event);
               }}
-              className="bg-pink-500 text-white px-8 py-4 rounded-full text-lg hover:bg-pink-600 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              className="bg-pink-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-lg hover:bg-pink-600 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full sm:w-auto"
             >
               Conheça Nossos Doces
             </button>
@@ -180,7 +235,7 @@ export function Home() {
       {/* Features Section */}
       <div className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-12">
             <div className="text-center">
               <div className="w-20 h-20 mx-auto mb-6 bg-pink-100 rounded-full flex items-center justify-center">
                 <svg className="w-10 h-10 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,56 +267,77 @@ export function Home() {
         </div>
       </div>
 
-      {/* Featured Products */}
       <div className="py-16 bg-pink-50">
         <div className="max-w-7xl mx-auto px-8">
-          <h2 className="text-5xl font-bold text-pink-600 text-center mb-12">
-            Nossos Destaques
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 transition-all">
-              <img
-                src="https://i.imgur.com/gDfGznA.png"
-                alt="Brigadeiro"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-xl font-semibold text-pink-600">Churros Explosivos</h3>
-                <p className="text-base text-gray-600">Massa sabor canela, no seu interior esfera de chocolate com recheio de doce de leite e pitanga de doce de leite</p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-pink-600 text-center mb-8 sm:mb-12">Nossos Destaques</h2>
+          <div className="relative">
+            {featured.length > 0 && (
+              <div
+                className="grid gap-6 sm:gap-8"
+                style={{ gridTemplateColumns: `repeat(${Math.min(itemsPerView, featured.length)}, minmax(0, 1fr))` }}
+              >
+                {Array.from({ length: Math.min(itemsPerView, featured.length) }).map((_, k) => {
+                  const item = featured[(startIndex + k) % featured.length];
+                  return (
+                    <div
+                      key={`${startIndex}-${k}`}
+                      className="group cursor-pointer rounded-2xl overflow-hidden shadow-lg transform hover:-translate-y-1 hover:shadow-2xl transition-all"
+                      onClick={() => {
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                        const event = new CustomEvent("setPage", { detail: "CARDAPIO" });
+                        window.dispatchEvent(event);
+                      }}
+                    >
+                      <div className="relative aspect-[4/5]">
+                        <img
+                          src={
+                            item.imageUrl ||
+                            "https://images.unsplash.com/photo-1582716401301-b2407dc7563d?auto=format&fit=crop&q=80"
+                          }
+                          alt={item.name}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                        {/* Overlay escuro para destacar o texto (ainda mais suave) */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-black/10 to-transparent" />
+                        {/* Nome do produto em branco, sem legenda/descrição */}
+                        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
+                          <h3 className="text-xl sm:text-2xl font-semibold text-white drop-shadow-md">
+                            {item.name}
+                          </h3>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+            )}
+            <div className="mt-6 flex items-center justify-center gap-3">
+              {featured.map((_, i) => (
+                <button
+                  key={i}
+                  className={`w-3 h-3 rounded-full transition-all ${startIndex % featured.length === i ? 'bg-pink-500 w-6' : 'bg-pink-300'}`}
+                  onClick={() => setStartIndex(i)}
+                  aria-label={`Ir para destaque ${i + 1}`}
+                />
+              ))}
             </div>
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 transition-all">
-              <img
-                src="https://i.imgur.com/PNMNjqz.png"
-                alt="Caramelado de Coco"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-xl font-semibold text-pink-600">Caramelado de Coco</h3>
-                <p className="text-base text-gray-600">Brigadeiro de coco, coberto com calda de caramelo e passado no coco queimado em flocos</p>
-              </div>
+            <div className="absolute inset-y-0 left-0 flex items-center">
+              <button
+                className="bg-white/80 hover:bg-white text-pink-600 rounded-full p-2 shadow"
+                onClick={() => featured.length > 0 && setStartIndex((i) => (i - 1 + featured.length) % featured.length)}
+                aria-label="Anterior"
+              >
+                ‹
+              </button>
             </div>
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 transition-all">
-              <img
-                src="https://i.imgur.com/WLYQlva.png"
-                alt="Bombom Trufado Supremo"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-xl font-semibold text-pink-600">Bombom Trufado Supremo</h3>
-                <p className="text-base text-gray-600">Recheio Ganache aerada de chocolate ao leite e meio amargo, um recheio leve que derrete na boca</p>
-              </div>
-            </div>
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 transition-all">
-              <img
-                src="https://i.imgur.com/MInxPCA.png"
-                alt="Bombom"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-xl font-semibold text-pink-600">Trouxinha de Chocolate</h3>
-                <p className="text-base text-gray-600">Massa sabor chocolate com recheio de cocadinha cremosa</p>
-              </div>
+            <div className="absolute inset-y-0 right-0 flex items-center">
+              <button
+                className="bg-white/80 hover:bg-white text-pink-600 rounded-full p-2 shadow"
+                onClick={() => featured.length > 0 && setStartIndex((i) => (i + 1) % featured.length)}
+                aria-label="Próximo"
+              >
+                ›
+              </button>
             </div>
           </div>
         </div>
@@ -276,15 +352,40 @@ export function Home() {
           <p className="text-2xl mb-8 opacity-90">
             Casamentos, aniversários, festas empresariais e muito mais
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => {
                 const message = encodeURIComponent("Olá! Gostaria de fazer um pedido.");
                 window.open(`https://wa.me/5532988759023?text=${message}`, '_blank');
               }}
-              className="bg-white text-pink-600 px-8 py-3 rounded-full text-lg hover:bg-pink-50 transition-colors"
+              className="bg-white text-pink-600 px-6 sm:px-8 py-3 rounded-full text-lg hover:bg-pink-50 transition-colors w-full sm:w-auto"
             >
               Faça seu Pedido
+            </button>
+            <button
+              onClick={() => {
+                // Dispara o evento para mudar para a página 'SOBRE NÓS'
+                const event = new CustomEvent('setPage', { detail: 'SOBRE NÓS' });
+                window.dispatchEvent(event);
+                
+                // Aguarda a mudança de página e então rola até a seção
+                setTimeout(() => {
+                  const section = document.querySelector('.text-3xl.font-bold.text-pink-600.text-center.mb-12');
+                  if (section) {
+                    const headerHeight = 120; // Aumentado o espaço para evitar corte do título
+                    const sectionRect = section.getBoundingClientRect();
+                    const absoluteTop = window.pageYOffset + sectionRect.top - headerHeight;
+                    
+                    window.scrollTo({
+                      top: absoluteTop,
+                      behavior: 'smooth'
+                    });
+                  }
+                }, 100);
+              }}
+              className="bg-pink-400 text-white px-6 sm:px-8 py-3 rounded-full text-lg hover:bg-pink-500 transition-colors w-full sm:w-auto"
+            >
+              Nossos Trabalhos
             </button>
             <button
               onClick={() => {
@@ -292,7 +393,7 @@ export function Home() {
                 const event = new CustomEvent('setPage', { detail: 'CARDAPIO' });
                 window.dispatchEvent(event);
               }}
-              className="border-2 border-white text-white px-8 py-3 rounded-full text-lg hover:bg-white hover:text-pink-600 transition-colors"
+              className="border-2 border-white text-white px-6 sm:px-8 py-3 rounded-full text-lg hover:bg-white hover:text-pink-600 transition-colors w-full sm:w-auto"
             >
               Ver Cardápio
             </button>
@@ -303,47 +404,41 @@ export function Home() {
       {/* Testimonials */}
       <div className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-8">
-          <h2 className="text-5xl font-bold text-pink-600 text-center mb-12">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-pink-600 text-center mb-8 sm:mb-12">
             O que nossos clientes dizem
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-pink-50 p-6 rounded-2xl">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-pink-200 rounded-full" style={{backgroundImage: "url('https://i.imgur.com/bB5aeBh.jpeg')", backgroundSize: 'cover'}}></div>
-                <div className="ml-4">
-                  <h4 className="text-lg font-semibold text-pink-600">Natália P.</h4>
-                  <p className="text-base text-gray-600">Casamento</p>
-                </div>
-              </div>
-              <p className="text-lg text-gray-600">
-                "Os doces fizeram o maior sucesso no meu casamento! Todos os convidados elogiaram muito!"
-              </p>
+
+          {testimonials && testimonials.length > 0 && (
+            <div
+              key={testimonialStartIndex}
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 testimonials-wrapper"
+            >
+              {Array.from({ length: Math.min(3, testimonials.length) }).map((_, offset) => {
+                const testimonial = testimonials[(testimonialStartIndex + offset) % testimonials.length];
+
+                return (
+                  <div
+                    key={`${testimonialStartIndex}-${offset}`}
+                    className="bg-pink-50 p-6 rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-xl h-full flex flex-col min-h-[260px]"
+                  >
+                    <div className="flex items-center mb-4">
+                      <div
+                        className="w-12 h-12 bg-pink-200 rounded-full bg-cover bg-center"
+                        style={{ backgroundImage: `url('${testimonial.photoUrl ?? ""}')` }}
+                      />
+                      <div className="ml-4">
+                        <h4 className="text-lg font-semibold text-pink-600">{testimonial.name}</h4>
+                        <p className="text-base text-gray-600">{testimonial.event}</p>
+                      </div>
+                    </div>
+                    <p className="text-lg text-gray-600 flex-1">
+                      "{testimonial.description}"
+                    </p>
+                  </div>
+                );
+              })}
             </div>
-            <div className="bg-pink-50 p-6 rounded-2xl">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-pink-200 rounded-full" style={{backgroundImage: "url('https://i.imgur.com/ukc5aXK.jpeg')", backgroundSize: 'cover'}}></div>
-                <div className="ml-4">
-                  <h4 className="text-lg font-semibold text-pink-600">Carlos S.</h4>
-                  <p className="text-base text-gray-600">Aniversário</p>
-                </div>
-              </div>
-              <p className="text-lg text-gray-600">
-                "Brigadeiros deliciosos e apresentação impecável. Superou todas as expectativas!"
-              </p>
-            </div>
-            <div className="bg-pink-50 p-6 rounded-2xl">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-pink-200 rounded-full" style={{backgroundImage: "url('https://i.imgur.com/hSlEErO.jpeg')", backgroundSize: 'cover'}}></div>
-                <div className="ml-4">
-                  <h4 className="text-lg font-semibold text-pink-600">Sandra M.</h4>
-                  <p className="text-base text-gray-600">Evento Empresarial</p>
-                </div>
-              </div>
-              <p className="text-lg text-gray-600">
-                "Profissionalismo e qualidade excepcionais. Já é nossa fornecedora oficial!"
-              </p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

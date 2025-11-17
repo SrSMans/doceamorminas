@@ -71,3 +71,37 @@ export const addExampleProducts = mutation({
     }
   },
 });
+
+// Seed dos depoimentos iniciais (os 3 que estavam no Home.tsx)
+export const addExampleTestimonials = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const testimonials = [
+      {
+        name: "Natália P.",
+        event: "Casamento",
+        description:
+          "Os doces fizeram o maior sucesso no meu casamento! Todos os convidados elogiaram muito!",
+        photoUrl: "https://i.imgur.com/bB5aeBh.jpeg",
+      },
+      {
+        name: "Carlos H.",
+        event: "Aniversário",
+        description:
+          "Brigadeiros deliciosos e apresentação impecável. Superou todas as expectativas!",
+        photoUrl: "https://i.imgur.com/ukc5aXK.jpeg",
+      },
+      {
+        name: "Regiane A.",
+        event: "Evento Empresarial",
+        description:
+          "Profissionalismo e qualidade excepcionais. Já é nossa fornecedora oficial!",
+        photoUrl: "https://i.imgur.com/2HlPphd.png",
+      },
+    ];
+
+    for (const testimonial of testimonials) {
+      await ctx.db.insert("testimonials", testimonial);
+    }
+  },
+});

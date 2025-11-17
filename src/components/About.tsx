@@ -1,11 +1,68 @@
+import { useState, useEffect } from "react";
+
 export function About() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  const eventImages = [
+    "https://i.imgur.com/LzJ4X5u.png",
+    "https://i.imgur.com/YprgS0m.png",
+    "https://i.imgur.com/xgMSAIC.png",
+    "https://i.imgur.com/f8wJIT1.png",
+    "https://i.imgur.com/DFzp0K4.png",
+    "https://i.imgur.com/5FaIx2k.png",
+    "https://i.imgur.com/mwD73ID.jpeg",
+    "https://i.imgur.com/Atoka40.png",
+    "https://i.imgur.com/Fjw6LSt.jpeg",
+  ];
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [opacity, setOpacity] = useState(1); // Estado para controlar a opacidade
+  const imagesToShow = 3;
+  const transitionDurationMs = 700; // Duração em ms para fade-in e fade-out
+  const cycleIntervalMs = 5000; // Intervalo total do ciclo de mudança de imagem
+
+  useEffect(() => {
+    let changeImageTimerId: ReturnType<typeof setTimeout>;
+
+    // Calcula o tempo que as imagens ficam totalmente visíveis
+    const displayFullyVisibleMs = cycleIntervalMs - transitionDurationMs;
+
+    // Timer para iniciar o processo de fade-out
+    const overallTimerId = setTimeout(() => {
+      setOpacity(0); // Inicia o fade-out
+
+      // Timer para mudar as imagens após o fade-out completar e então iniciar o fade-in
+      changeImageTimerId = setTimeout(() => {
+        setCurrentImageIndex((prevIndex) => {
+          const nextIndex = prevIndex + imagesToShow;
+          return nextIndex >= eventImages.length ? 0 : nextIndex;
+        });
+        setOpacity(1); // Inicia o fade-in para as novas imagens
+      }, transitionDurationMs);
+
+    }, displayFullyVisibleMs > 0 ? displayFullyVisibleMs : 0); // Garante que o tempo não seja negativo
+
+    return () => {
+      clearTimeout(overallTimerId);
+      clearTimeout(changeImageTimerId); // Limpa o timer interno também
+    };
+  }, [currentImageIndex, eventImages.length, imagesToShow, cycleIntervalMs, transitionDurationMs]);
+
+  const visibleImages = eventImages.slice(currentImageIndex, currentImageIndex + imagesToShow);
+  // Se chegou ao fim e não completou 'imagesToShow', pega do início para completar
+  if (visibleImages.length < imagesToShow && eventImages.length > imagesToShow) {
+    const remaining = imagesToShow - visibleImages.length;
+    visibleImages.push(...eventImages.slice(0, remaining));
+  }
   return (
     <div className="bg-white">
       {/* Hero Section */}
       <div className="relative h-[300px] bg-gradient-to-b from-pink-100 to-white">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1486427944299-d1955d23e34d?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-10"></div>
-        <div className="max-w-7xl mx-auto px-8 h-full flex items-center justify-center">
-          <h1 className="text-5xl font-bold text-pink-600 text-center relative z-0">
+        <div className="absolute inset-0 bg-[url('https://cdn.pixabay.com/photo/2023/12/18/11/05/chocolate-8455786_1280.jpg')] bg-cover bg-center opacity-20"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-pink-50/50"></div>
+        <div className="max-w-7xl mx-auto px-8 h-full flex items-center justify-center relative z-10">
+          <h1 className="text-5xl font-bold text-pink-600 text-center drop-shadow-lg">
             Sobre Nós
           </h1>
         </div>
@@ -21,7 +78,7 @@ export function About() {
                 A Doce Amor Minas nasceu da paixão pela confeitaria e do desejo de transformar momentos especiais em doces memórias.
               </p>
               <p className="text-gray-600 leading-relaxed">
-                Sob a liderança de Angela Nascimento Laureth, especialista em Segurança de Alimentos e com diversos cursos de confeitaria, 
+                Sob a liderança de Maria Angela Nascimento Laureth, especialista em Segurança de Alimentos e com diversos cursos de confeitaria, 
                 nossa confeitaria se dedica a criar experiências únicas através de doces artesanais de alta qualidade.
               </p>
               <p className="text-gray-600 leading-relaxed">
@@ -32,14 +89,42 @@ export function About() {
           </div>
           <div className="relative">
             <div className="aspect-square rounded-full overflow-hidden shadow-xl">
-              <div className="w-full h-full bg-pink-100 flex items-center justify-center">
-                <svg className="w-32 h-32 text-pink-300" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                </svg>
-              </div>
+              <img 
+                src="https://i.imgur.com/XjnxZcg.png" 
+                alt="Maria Angela Nascimento Laureth"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="absolute -bottom-4 right-4 bg-pink-500 text-white py-2 px-4 rounded-full shadow-lg">
               Especialista em Confeitaria
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Eventos Section */}
+      <div className="py-16 bg-pink-50">
+        <div className="max-w-7xl mx-auto px-8">
+          <h2 className="text-3xl font-bold text-pink-600 text-center mb-12">
+            Momentos Adoçados por Nós
+          </h2>
+          <div className="relative w-full overflow-hidden">
+            <div 
+              className="flex flex-col sm:flex-row" // Removido transition-transform, opacidade controlada por style
+              style={{
+                opacity: opacity,
+                transition: `opacity ${transitionDurationMs}ms ease-in-out`,
+              }}
+            >
+              {visibleImages.map((src, index) => (
+                <div key={index} className="w-full sm:w-1/3 flex-shrink-0 px-2 mb-4 sm:mb-0">
+                  <img 
+                    src={src} 
+                    alt={`Evento ${currentImageIndex + index + 1}`} 
+                    className="w-full h-64 sm:h-96 object-cover rounded-lg shadow-lg transition-transform duration-300 ease-in-out hover:scale-105"
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -126,7 +211,7 @@ export function About() {
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <svg className="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                   </svg>
                 </div>
                 <div>
