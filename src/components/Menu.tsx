@@ -221,7 +221,6 @@ export function Menu() {
                   key={product._id} 
                   className="group cursor-pointer"
                   onClick={() => setActiveProduct(activeProduct === product._id ? null : product._id)}
-                  onTouchStart={() => setActiveProduct(product._id)}
                   onMouseEnter={() => {
                     // Detecta se é um dispositivo touch
                     if (!('ontouchstart' in window)) {
