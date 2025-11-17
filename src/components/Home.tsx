@@ -112,20 +112,16 @@ export function Home() {
   const handleTouchEnd = () => {
     setIsDragging(false);
     const swipeDistance = touchStart - touchEnd;
-    const currentOffset = dragOffset;
-    const cardWidth = containerWidth / itemsPerView + (itemsPerView === 1 ? 0 : 32);
+    const threshold = containerWidth * 0.25; // 25% da largura do container
     
-    // Determina a direção baseada no offset atual
-    if (Math.abs(swipeDistance) > 50) {
+    // Se passou do threshold, muda de card
+    if (Math.abs(swipeDistance) > threshold) {
       setIsTransitioning(true);
       
       if (swipeDistance > 0) {
         // Swipe para a esquerda - avançar
-        // Completa a animação continuando na direção do arrasto
-        const targetOffset = -cardWidth - currentOffset;
-        setDragOffset(currentOffset + targetOffset);
+        setDragOffset(-containerWidth);
         
-        // Aguarda a animação terminar antes de mudar o índice
         setTimeout(() => {
           if (featured.length > 0) {
             setStartIndex((i) => (i + 1) % featured.length);
@@ -135,11 +131,8 @@ export function Home() {
         }, 400);
       } else {
         // Swipe para a direita - voltar
-        // Completa a animação continuando na direção do arrasto
-        const targetOffset = cardWidth - currentOffset;
-        setDragOffset(currentOffset + targetOffset);
+        setDragOffset(containerWidth);
         
-        // Aguarda a animação terminar antes de mudar o índice
         setTimeout(() => {
           if (featured.length > 0) {
             setStartIndex((i) => (i - 1 + featured.length) % featured.length);

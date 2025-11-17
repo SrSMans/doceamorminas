@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import ClickSpark from './ClickSpark';
 
 export function About() {
   useEffect(() => {
@@ -56,6 +57,13 @@ export function About() {
     visibleImages.push(...eventImages.slice(0, remaining));
   }
   return (
+    <ClickSpark
+      sparkColor='#dd7ffa'
+      sparkSize={10}
+      sparkRadius={15}
+      sparkCount={8}
+      duration={400}
+    >
     <div className="bg-white">
       {/* Hero Section */}
       <div className="relative h-[300px] bg-gradient-to-b from-pink-100 to-white">
@@ -259,5 +267,6 @@ export function About() {
         </div>
       </div>
     </div>
+    </ClickSpark>
   );
 }

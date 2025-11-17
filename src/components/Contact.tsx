@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Percent, ShoppingBag } from 'lucide-react';
 import './Contact.css';
+import ClickSpark from './ClickSpark';
 
 export function Contact() {
   const [hearts, setHearts] = useState([]);
@@ -50,6 +51,13 @@ export function Contact() {
   };
 
   return (
+    <ClickSpark
+      sparkColor='#dd7ffa'
+      sparkSize={10}
+      sparkRadius={15}
+      sparkCount={8}
+      duration={400}
+    >
     <div className="bg-gradient-to-br from-pink-50 via-white to-pink-100 min-h-screen py-16 md:py-24 relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
@@ -178,5 +186,6 @@ export function Contact() {
         ))}
       </div>
     </div>
+    </ClickSpark>
   );
 }
