@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 
-type TabKey = "ANUNCIOS" | "MENU" | "DEPOIMENTOS" | "ESTATISTICAS";
+type TabKey = "ANUNCIOS" | "MENU" | "DEPOIMENTOS";
 
 export function Jujuba() {
   const navigate = useNavigate();
@@ -29,8 +29,6 @@ export function Jujuba() {
   const testimonials = useQuery(api.testimonials.list, {});
   const addTestimonial = useMutation(api.testimonials.add);
   const updateTestimonial = useMutation(api.testimonials.update);
-
-  const visitStats = useQuery(api.stats.visitTotals, {});
 
   // categorias existentes (criadas a partir dos produtos já cadastrados)
   const categories = Array.from(
@@ -221,7 +219,6 @@ export function Jujuba() {
             { key: "ANUNCIOS", label: "Anúncios" },
             { key: "MENU", label: "Menu (Doces)" },
             { key: "DEPOIMENTOS", label: "Depoimentos" },
-            { key: "ESTATISTICAS", label: "Estatísticas" },
           ] as { key: TabKey; label: string }[]).map((tab) => (
             <button
               key={tab.key}
@@ -734,72 +731,6 @@ export function Jujuba() {
                 </li>
               )}
             </ul>
-          </section>
-        )}
-
-        {activeTab === "ESTATISTICAS" && (
-          <section className="bg-white rounded-2xl shadow-sm border border-pink-100 p-6 space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-pink-600">Estatísticas de visitas</h2>
-                <p className="text-sm text-gray-500">
-                  Visitantes únicos por IP (conta uma vez por dia).
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-pink-50 border border-pink-100 rounded-xl p-4">
-                <p className="text-xs text-gray-500">Hoje</p>
-                <p className="text-2xl font-semibold text-pink-600">
-                  {visitStats?.today ?? 0}
-                </p>
-              </div>
-              <div className="bg-pink-50 border border-pink-100 rounded-xl p-4">
-                <p className="text-xs text-gray-500">Últimos 7 dias</p>
-                <p className="text-2xl font-semibold text-pink-600">
-                  {visitStats?.week ?? 0}
-                </p>
-              </div>
-              <div className="bg-pink-50 border border-pink-100 rounded-xl p-4">
-                <p className="text-xs text-gray-500">Este mês</p>
-                <p className="text-2xl font-semibold text-pink-600">
-                  {visitStats?.month ?? 0}
-                </p>
-              </div>
-            </div>
-
-            {visitStats?.daily && (
-              <div className="mt-4">
-                <h3 className="text-sm font-semibold text-pink-600 mb-2">
-                  Visitas por dia
-                </h3>
-                <ul className="text-xs text-gray-700 space-y-1 max-h-48 overflow-y-auto">
-                  {visitStats.daily.map((d) => (
-                    <li key={d.day} className="flex justify-between">
-                      <span>{d.day}</span>
-                      <span className="font-medium text-pink-600">{d.count}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {visitStats?.monthly && (
-              <div className="mt-4">
-                <h3 className="text-sm font-semibold text-pink-600 mb-2">
-                  Visitas por mês
-                </h3>
-                <ul className="text-xs text-gray-700 space-y-1 max-h-48 overflow-y-auto">
-                  {visitStats.monthly.map((m) => (
-                    <li key={m.month} className="flex justify-between">
-                      <span>{m.month}</span>
-                      <span className="font-medium text-pink-600">{m.count}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </section>
         )}
       </main>

@@ -22,11 +22,6 @@ export default defineSchema({
     description: v.string(),
     photoUrl: v.optional(v.string()),
   }),
-  visits: defineTable({
-    ip: v.string(),
-    day: v.string(), // "YYYY-MM-DD"
-    createdAt: v.number(),
-  }).index("by_day_ip", ["day", "ip"]),
   announcements: defineTable({
     active: v.boolean(),
     title: v.string(),

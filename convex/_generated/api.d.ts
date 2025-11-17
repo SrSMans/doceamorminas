@@ -17,9 +17,7 @@ import type * as announcements from "../announcements.js";
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as products from "../products.js";
-import type * as router from "../router.js";
 import type * as seed from "../seed.js";
-import type * as stats from "../stats.js";
 import type * as testimonials from "../testimonials.js";
 import type * as users from "../users.js";
 
@@ -36,9 +34,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   http: typeof http;
   products: typeof products;
-  router: typeof router;
   seed: typeof seed;
-  stats: typeof stats;
   testimonials: typeof testimonials;
   users: typeof users;
 }>;

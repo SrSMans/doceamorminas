@@ -1,4 +1,4 @@
-import { Authenticated, Unauthenticated, useConvex } from "convex/react";
+import { Authenticated, Unauthenticated } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { SignInForm } from "./SignInForm";
 import { SignOutButton } from "./SignOutButton";
@@ -12,37 +12,6 @@ import { Contact } from "./components/Contact";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState("INICIO");
-  const convex = useConvex();
-
-  // Registrar visita ao carregar o site
-  useEffect(() => {
-    const trackVisit = async () => {
-      try {
-        const convexUrl = import.meta.env.VITE_CONVEX_URL as string;
-        // Converte de https://nome.convex.cloud para https://nome.convex.site
-        const httpUrl = convexUrl.replace('.convex.cloud', '.convex.site');
-        const fullUrl = `${httpUrl}/trackVisit`;
-        
-        console.log('Tentando registrar visita em:', fullUrl);
-        
-        const response = await fetch(fullUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        
-        if (response.ok) {
-          console.log('Visita registrada com sucesso!');
-        } else {
-          console.error('Erro ao registrar visita:', response.status, response.statusText);
-        }
-      } catch (error) {
-        console.error('Erro ao registrar visita:', error);
-      }
-    };
-    trackVisit();
-  }, []);
 
   useEffect(() => {
     const handlePageChange = (event: CustomEvent) => {
