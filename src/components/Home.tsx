@@ -45,6 +45,10 @@ export function Home() {
   const featured = useQuery(api.products.listByCategory, { category: 'DESTAQUES' }) || [];
   const [itemsPerView, setItemsPerView] = React.useState(4);
   const [startIndex, setStartIndex] = React.useState(0);
+  
+  // Estados para controlar o swipe/arrasto
+  const [touchStart, setTouchStart] = React.useState(0);
+  const [touchEnd, setTouchEnd] = React.useState(0);
   React.useEffect(() => {
     const update = () => {
       const w = window.innerWidth;
@@ -64,6 +68,31 @@ export function Home() {
       return () => clearInterval(interval);
     }
   }, [featured.length]);
+  
+  // Funções para detectar swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+  
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+  
+  const handleTouchEnd = () => {
+    if (touchStart - touchEnd > 75) {
+      // Swipe para a esquerda - avançar
+      if (featured.length > 0) {
+        setStartIndex((i) => (i + 1) % featured.length);
+      }
+    }
+    
+    if (touchStart - touchEnd < -75) {
+      // Swipe para a direita - voltar
+      if (featured.length > 0) {
+        setStartIndex((i) => (i - 1 + featured.length) % featured.length);
+      }
+    }
+  };
   // Estado para controlar a imagem atual do carrossel
   const [currentImage, setCurrentImage] = React.useState(0);
   
@@ -273,8 +302,11 @@ export function Home() {
           <div className="relative">
             {featured.length > 0 && (
               <div
-                className="grid gap-6 sm:gap-8"
+                className="grid gap-6 sm:gap-8 swipe-container"
                 style={{ gridTemplateColumns: `repeat(${Math.min(itemsPerView, featured.length)}, minmax(0, 1fr))` }}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
               >
                 {Array.from({ length: Math.min(itemsPerView, featured.length) }).map((_, k) => {
                   const item = featured[(startIndex + k) % featured.length];
@@ -321,7 +353,7 @@ export function Home() {
                 />
               ))}
             </div>
-            <div className="absolute inset-y-0 left-0 flex items-center">
+            <div className="absolute inset-y-0 left-0 items-center hidden md:flex">
               <button
                 className="bg-white/80 hover:bg-white text-pink-600 rounded-full p-2 shadow"
                 onClick={() => featured.length > 0 && setStartIndex((i) => (i - 1 + featured.length) % featured.length)}
@@ -330,7 +362,7 @@ export function Home() {
                 ‹
               </button>
             </div>
-            <div className="absolute inset-y-0 right-0 flex items-center">
+            <div className="absolute inset-y-0 right-0 items-center hidden md:flex">
               <button
                 className="bg-white/80 hover:bg-white text-pink-600 rounded-full p-2 shadow"
                 onClick={() => featured.length > 0 && setStartIndex((i) => (i + 1) % featured.length)}

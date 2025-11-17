@@ -221,8 +221,19 @@ export function Menu() {
                   key={product._id} 
                   className="group cursor-pointer"
                   onClick={() => setActiveProduct(activeProduct === product._id ? null : product._id)}
-                  onMouseEnter={() => setActiveProduct(product._id)}
-                  onMouseLeave={() => setActiveProduct(null)}
+                  onTouchStart={() => setActiveProduct(product._id)}
+                  onMouseEnter={() => {
+                    // Detecta se é um dispositivo touch
+                    if (!('ontouchstart' in window)) {
+                      setActiveProduct(product._id);
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    // Detecta se é um dispositivo touch
+                    if (!('ontouchstart' in window)) {
+                      setActiveProduct(null);
+                    }
+                  }}
                 >
                   <div className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-lg transition-all duration-500 group-hover:shadow-2xl group-hover:-translate-y-2">
                     {/* Main Image */}
