@@ -52,12 +52,19 @@ export function Home() {
   const [isDragging, setIsDragging] = React.useState(false);
   const [dragOffset, setDragOffset] = React.useState(0);
   const autoPlayIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
+  const carouselRef = React.useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = React.useState(0);
   React.useEffect(() => {
     const update = () => {
       const w = window.innerWidth;
       if (w < 640) setItemsPerView(1);
       else if (w < 1024) setItemsPerView(2);
       else setItemsPerView(4);
+      
+      // Atualiza a largura do container
+      if (carouselRef.current) {
+        setContainerWidth(carouselRef.current.offsetWidth);
+      }
     };
     update();
     window.addEventListener('resize', update);
@@ -329,52 +336,61 @@ export function Home() {
       <div className="py-16 bg-pink-50">
         <div className="max-w-7xl mx-auto px-8">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-pink-600 text-center mb-8 sm:mb-12">Nossos Destaques</h2>
-          <div className="relative">
+          <div className="relative overflow-hidden" ref={carouselRef}>
             {featured.length > 0 && (
               <div
-                className="grid gap-6 sm:gap-8 swipe-container"
-                style={{ 
-                  gridTemplateColumns: `repeat(${Math.min(itemsPerView, featured.length)}, minmax(0, 1fr))`,
-                  transform: `translateX(${dragOffset}px)`,
-                  transition: isDragging ? 'none' : 'transform 0.3s ease-out'
-                }}
+                className="swipe-container"
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
               >
-                {Array.from({ length: Math.min(itemsPerView, featured.length) }).map((_, k) => {
-                  const item = featured[(startIndex + k) % featured.length];
-                  return (
-                    <div
-                      key={`${startIndex}-${k}`}
-                      className="group cursor-pointer rounded-2xl overflow-hidden shadow-lg transform hover:-translate-y-1 hover:shadow-2xl transition-all"
-                      onClick={() => {
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                        const event = new CustomEvent("setPage", { detail: "CARDAPIO" });
-                        window.dispatchEvent(event);
-                      }}
-                    >
-                      <div className="relative aspect-[4/5]">
-                        <img
-                          src={
-                            item.imageUrl ||
-                            "https://images.unsplash.com/photo-1582716401301-b2407dc7563d?auto=format&fit=crop&q=80"
-                          }
-                          alt={item.name}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                        {/* Overlay escuro para destacar o texto (ainda mais suave) */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-black/10 to-transparent" />
-                        {/* Nome do produto em branco, sem legenda/descrição */}
-                        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
-                          <h3 className="text-xl sm:text-2xl font-semibold text-white drop-shadow-md">
-                            {item.name}
-                          </h3>
+                <div
+                  className="flex gap-6 sm:gap-8"
+                  style={{ 
+                    transform: `translateX(calc(-${containerWidth / itemsPerView + (itemsPerView === 1 ? 0 : 16)}px + ${dragOffset}px))`,
+                    transition: isDragging ? 'none' : 'transform 0.3s ease-out'
+                  }}
+                >
+                  {/* Renderiza cards extras para o efeito de peek */}
+                  {Array.from({ length: Math.min(itemsPerView, featured.length) + 2 }).map((_, k) => {
+                    // Ajusta o índice para mostrar também o card anterior e próximo
+                    const adjustedIndex = (startIndex - 1 + k + featured.length) % featured.length;
+                    const item = featured[adjustedIndex];
+                    const cardWidth = itemsPerView === 1 ? '100%' : itemsPerView === 2 ? 'calc(50% - 1rem)' : 'calc(33.333% - 1.333rem)';
+                    
+                    return (
+                      <div
+                        key={`${startIndex}-${k}`}
+                        className="group cursor-pointer rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all flex-shrink-0"
+                        style={{ width: cardWidth }}
+                        onClick={() => {
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                          const event = new CustomEvent("setPage", { detail: "CARDAPIO" });
+                          window.dispatchEvent(event);
+                        }}
+                      >
+                        <div className="relative aspect-[4/5]">
+                          <img
+                            src={
+                              item.imageUrl ||
+                              "https://images.unsplash.com/photo-1582716401301-b2407dc7563d?auto=format&fit=crop&q=80"
+                            }
+                            alt={item.name}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          />
+                          {/* Overlay escuro para destacar o texto (ainda mais suave) */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-black/10 to-transparent" />
+                          {/* Nome do produto em branco, sem legenda/descrição */}
+                          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
+                            <h3 className="text-xl sm:text-2xl font-semibold text-white drop-shadow-md">
+                              {item.name}
+                            </h3>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             )}
             <div className="mt-6 flex items-center justify-center gap-3">
