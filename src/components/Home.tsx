@@ -112,16 +112,18 @@ export function Home() {
   const handleTouchEnd = () => {
     setIsDragging(false);
     const swipeDistance = touchStart - touchEnd;
+    const currentOffset = dragOffset;
+    const cardWidth = containerWidth / itemsPerView + (itemsPerView === 1 ? 0 : 32);
     
-    if (Math.abs(swipeDistance) > 75) {
-      // Inicia a transição animada
+    // Determina a direção baseada no offset atual
+    if (Math.abs(swipeDistance) > 50) {
       setIsTransitioning(true);
       
       if (swipeDistance > 0) {
         // Swipe para a esquerda - avançar
-        // Anima o slide para a esquerda
-        const cardWidth = containerWidth / itemsPerView + (itemsPerView === 1 ? 0 : 16);
-        setDragOffset(-cardWidth);
+        // Completa a animação continuando na direção do arrasto
+        const targetOffset = -cardWidth - currentOffset;
+        setDragOffset(currentOffset + targetOffset);
         
         // Aguarda a animação terminar antes de mudar o índice
         setTimeout(() => {
@@ -130,12 +132,12 @@ export function Home() {
           }
           setDragOffset(0);
           setIsTransitioning(false);
-        }, 300);
+        }, 400);
       } else {
         // Swipe para a direita - voltar
-        // Anima o slide para a direita
-        const cardWidth = containerWidth / itemsPerView + (itemsPerView === 1 ? 0 : 16);
-        setDragOffset(cardWidth);
+        // Completa a animação continuando na direção do arrasto
+        const targetOffset = cardWidth - currentOffset;
+        setDragOffset(currentOffset + targetOffset);
         
         // Aguarda a animação terminar antes de mudar o índice
         setTimeout(() => {
@@ -144,7 +146,7 @@ export function Home() {
           }
           setDragOffset(0);
           setIsTransitioning(false);
-        }, 300);
+        }, 400);
       }
       // Reseta o timer após mudança manual
       resetAutoPlay();
