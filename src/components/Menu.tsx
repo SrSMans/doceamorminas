@@ -244,10 +244,10 @@ className="w-full h-full object-cover transition-all duration-700 group-hover:sc
                     
                     {/* Content container with enhanced animations */}
                     <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 via-black/50 to-transparent flex flex-col">
-                      {/* Description - ALWAYS visible on mobile, disappears with zoom in on click */}
+                      {/* Description - ALWAYS visible on mobile, disappears with zoom in on click, reappears with zoom out on second click */}
                       <div className={`overflow-hidden transition-all duration-500 ease-out order-2 ${
                         activeProduct === product._id 
-                          ? 'md:max-h-40 md:opacity-100 md:transform md:translate-y-0 max-h-40 opacity-0 scale-110' 
+                          ? 'md:max-h-40 md:opacity-100 md:transform md:translate-y-0 max-h-0 opacity-0 scale-110' 
                           : 'md:max-h-0 md:opacity-0 md:transform md:translate-y-4 max-h-40 opacity-100 scale-100'
                       }`}>
                         <p className="text-white/90 text-sm sm:text-base md:text-lg leading-relaxed backdrop-blur-sm bg-black/20 rounded-lg p-2 sm:p-3">
