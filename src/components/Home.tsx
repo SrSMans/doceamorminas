@@ -2,6 +2,7 @@ import React from 'react';
 import './Home.css';
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import ClickSpark from './ClickSpark';
 
 export function Home() {
   // Estado para controlar o efeito de partículas
@@ -51,6 +52,7 @@ export function Home() {
   const [touchEnd, setTouchEnd] = React.useState(0);
   const [isDragging, setIsDragging] = React.useState(false);
   const [dragOffset, setDragOffset] = React.useState(0);
+  const [isTransitioning, setIsTransitioning] = React.useState(false);
   const autoPlayIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
   const carouselRef = React.useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = React.useState(0);
@@ -112,23 +114,48 @@ export function Home() {
     const swipeDistance = touchStart - touchEnd;
     
     if (Math.abs(swipeDistance) > 75) {
+      // Inicia a transição animada
+      setIsTransitioning(true);
+      
       if (swipeDistance > 0) {
         // Swipe para a esquerda - avançar
-        if (featured.length > 0) {
-          setStartIndex((i) => (i + 1) % featured.length);
-        }
+        // Anima o slide para a esquerda
+        const cardWidth = containerWidth / itemsPerView + (itemsPerView === 1 ? 0 : 16);
+        setDragOffset(-cardWidth);
+        
+        // Aguarda a animação terminar antes de mudar o índice
+        setTimeout(() => {
+          if (featured.length > 0) {
+            setStartIndex((i) => (i + 1) % featured.length);
+          }
+          setDragOffset(0);
+          setIsTransitioning(false);
+        }, 300);
       } else {
         // Swipe para a direita - voltar
-        if (featured.length > 0) {
-          setStartIndex((i) => (i - 1 + featured.length) % featured.length);
-        }
+        // Anima o slide para a direita
+        const cardWidth = containerWidth / itemsPerView + (itemsPerView === 1 ? 0 : 16);
+        setDragOffset(cardWidth);
+        
+        // Aguarda a animação terminar antes de mudar o índice
+        setTimeout(() => {
+          if (featured.length > 0) {
+            setStartIndex((i) => (i - 1 + featured.length) % featured.length);
+          }
+          setDragOffset(0);
+          setIsTransitioning(false);
+        }, 300);
       }
       // Reseta o timer após mudança manual
       resetAutoPlay();
+    } else {
+      // Se não passou do threshold, volta suavemente para a posição original
+      setIsTransitioning(true);
+      setDragOffset(0);
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 300);
     }
-    
-    // Reseta o offset com animação
-    setDragOffset(0);
   };
   // Estado para controlar a imagem atual do carrossel
   const [currentImage, setCurrentImage] = React.useState(0);
@@ -230,6 +257,13 @@ export function Home() {
   }, [testimonials?.length]);
   
   return (
+    <ClickSpark
+      sparkColor='#dd7ffa'
+      sparkSize={10}
+      sparkRadius={15}
+      sparkCount={8}
+      duration={400}
+    >
     <div className="relative">
       {/* Hero Section with Parallax Effect and Image Carousel */}
       <div className="relative h-[500px] sm:h-[600px] overflow-hidden">
@@ -348,7 +382,7 @@ export function Home() {
                   className="flex gap-6 sm:gap-8"
                   style={{ 
                     transform: `translateX(calc(-${containerWidth / itemsPerView + (itemsPerView === 1 ? 0 : 16)}px + ${dragOffset}px))`,
-                    transition: isDragging ? 'none' : 'transform 0.3s ease-out'
+                    transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                   }}
                 >
                   {/* Renderiza cards extras para o efeito de peek */}
@@ -537,5 +571,6 @@ export function Home() {
         </div>
       </div>
     </div>
+    </ClickSpark>
   );
 }
