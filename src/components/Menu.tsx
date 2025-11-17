@@ -244,11 +244,11 @@ className="w-full h-full object-cover transition-all duration-700 group-hover:sc
                     
                     {/* Content container with enhanced animations */}
                     <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 via-black/50 to-transparent">
-                      {/* Title with glow effect */}
+                      {/* Title with glow effect - moves down on mobile when description is hidden */}
                       <h3 className={`text-lg sm:text-xl md:text-2xl font-semibold text-white mb-2 sm:mb-3 transition-all duration-500 ${
                         activeProduct === product._id 
-                          ? 'transform translate-y-0 text-shadow-lg' 
-                          : 'transform translate-y-2'
+                          ? 'md:transform md:translate-y-0 md:text-shadow-lg transform translate-y-0 text-shadow-lg' 
+                          : 'md:transform md:translate-y-2 transform translate-y-32'
                       }`} style={{
                         textShadow: activeProduct === product._id 
                           ? '0 0 30px rgba(255, 255, 255, 0.8), 0 0 60px rgba(236, 72, 153, 0.6)' 
