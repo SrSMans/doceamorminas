@@ -242,8 +242,6 @@ export function Menu() {
 className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
                     />
                     
-                    
-                    
                     {/* Content container with enhanced animations */}
                     <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 via-black/50 to-transparent">
                       {/* Title with glow effect */}
@@ -259,11 +257,11 @@ className="w-full h-full object-cover transition-all duration-700 group-hover:sc
                         {product.name}
                       </h3>
                       
-                      {/* Description with slide and fade effect */}
-                      <div className={`overflow-hidden transition-all duration-700 ease-out ${
+                      {/* Description - ALWAYS visible on mobile, with zoom effect */}
+                      <div className={`overflow-hidden transition-all duration-500 ease-out ${
                         activeProduct === product._id 
-                          ? 'max-h-40 opacity-100 transform translate-y-0' 
-                          : 'max-h-0 opacity-0 transform translate-y-4'
+                          ? 'md:max-h-40 md:opacity-100 md:transform md:translate-y-0 scale-100 opacity-100 max-h-40' 
+                          : 'md:max-h-0 md:opacity-0 md:transform md:translate-y-4 md:scale-100 scale-95 opacity-0 max-h-0'
                       }`}>
                         <p className="text-white/90 text-sm sm:text-base md:text-lg leading-relaxed backdrop-blur-sm bg-black/20 rounded-lg p-2 sm:p-3">
                           {product.description}
@@ -272,7 +270,7 @@ className="w-full h-full object-cover transition-all duration-700 group-hover:sc
                       
                       {/* Decorative line animation */}
                       <div className={`absolute bottom-0 left-8 right-8 h-0.5 bg-pink-400 transition-all duration-700 ${
-                        activeProduct === product._id ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
+                        activeProduct === product._id ? 'md:opacity-100 md:scale-x-100 opacity-100 scale-x-100' : 'md:opacity-0 md:scale-x-0 opacity-100 scale-x-100'
                       }`}></div>
                     </div>
                   </div>
