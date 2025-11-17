@@ -239,7 +239,7 @@ export function Menu() {
                     <img
                       src={product.imageUrl || "https://images.unsplash.com/photo-1582716401301-b2407dc7563d?auto=format&fit=crop&q=80"}
                       alt={product.name}
-className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
+                      className={`w-full h-full object-cover transition-transform duration-500 ${activeProduct === product._id ? 'scale-110' : 'scale-100'} md:group-hover:scale-110`}
                     />
                     
                     {/* Content container with enhanced animations */}
