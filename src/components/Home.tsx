@@ -52,9 +52,7 @@ export function Home() {
   const [touchEnd, setTouchEnd] = React.useState(0);
   const [isDragging, setIsDragging] = React.useState(false);
   const [dragOffset, setDragOffset] = React.useState(0);
-  const [isTransitioning, setIsTransitioning] = React.useState(false);
-  const [animType, setAnimType] = React.useState<'none' | 'auto' | 'manual'>('none');
-  const [animDirection, setAnimDirection] = React.useState<'left' | 'right' | null>(null);
+  const [isSnapping, setIsSnapping] = React.useState(false);
   const autoPlayIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
   const carouselRef = React.useRef<HTMLDivElement>(null);
   const innerRef = React.useRef<HTMLDivElement>(null);
@@ -76,25 +74,19 @@ export function Home() {
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
   }, []);
-  // Avanço automático com animação
-  const autoAdvance = React.useCallback(() => {
-    if (isDragging || animType !== 'none' || !slideStep) return;
-    setAnimType('auto');
-    setAnimDirection('left');
-    setDragOffset(-slideStep);
-  }, [isDragging, animType, slideStep]);
-
-  // Função para resetar o timer automático
+  // Função para resetar o timer automático (sem animação de chegada)
   const resetAutoPlay = React.useCallback(() => {
     if (autoPlayIntervalRef.current) {
       clearInterval(autoPlayIntervalRef.current);
     }
     if (featured.length > 0) {
       autoPlayIntervalRef.current = setInterval(() => {
-        autoAdvance();
+        if (!isDragging && !isSnapping) {
+          setStartIndex((i) => (i + 1) % featured.length);
+        }
       }, 5000);
     }
-  }, [featured.length, autoAdvance]);
+  }, [featured.length, isDragging, isSnapping]);
 
   React.useEffect(() => {
     resetAutoPlay();
@@ -131,6 +123,7 @@ export function Home() {
       clearInterval(autoPlayIntervalRef.current);
       autoPlayIntervalRef.current = null;
     }
+    setIsSnapping(false);
     setTouchStart(e.targetTouches[0].clientX);
     setTouchEnd(e.targetTouches[0].clientX);
     setIsDragging(true);
@@ -151,41 +144,24 @@ export function Home() {
     const threshold = Math.max(40, slideStep * 0.25);
 
     if (slideStep && Math.abs(delta) >= threshold) {
-      setAnimType('manual');
-      if (delta < 0) {
-        setAnimDirection('left');
-        setDragOffset(-slideStep);
-      } else {
-        setAnimDirection('right');
-        setDragOffset(slideStep);
-      }
+      // Snap simples: completa a animação e troca
+      setIsSnapping(true);
+      const direction = delta < 0 ? -1 : 1;
+      setDragOffset(direction * slideStep);
+      const duration = 300;
+      setTimeout(() => {
+        setStartIndex((i) => (i + (direction < 0 ? 1 : -1) + featured.length) % featured.length);
+        setDragOffset(0);
+        setIsSnapping(false);
+        resetAutoPlay();
+      }, duration);
     } else {
-      // Volta para posição inicial suavemente
+      // Volta para posição inicial sem trocar
+      setIsSnapping(true);
       setDragOffset(0);
-    }
-  };
-  // Finaliza animações (manual/auto) ao término da transição
-  const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
-    // Garante que só tratamos a transição do contêiner interno, não de filhos
-    if (!innerRef.current || e.target !== innerRef.current) return;
-    if (animType === 'none') return;
-
-    // Deferimos para o próximo frame para evitar flicker entre troca e reset do offset
-    requestAnimationFrame(() => {
-      if (animDirection === 'left') {
-        if (featured.length > 0) {
-          setStartIndex((i) => (i + 1) % featured.length);
-        }
-      } else if (animDirection === 'right') {
-        if (featured.length > 0) {
-          setStartIndex((i) => (i - 1 + featured.length) % featured.length);
-        }
-      }
-      setDragOffset(0);
-      setAnimType('none');
-      setAnimDirection(null);
+      setTimeout(() => setIsSnapping(false), 200);
       resetAutoPlay();
-    });
+    }
   };
 
   // Estado para controlar a imagem atual do carrossel
@@ -490,10 +466,9 @@ export function Home() {
                   <div
                     className="flex gap-6 sm:gap-8"
                     ref={innerRef}
-                    onTransitionEnd={handleTransitionEnd}
                     style={{ 
                       transform: `translateX(calc(-${slideStep}px + ${dragOffset}px))`,
-                      transition: isDragging ? 'none' : 'transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1)'
+                      transition: isSnapping ? 'transform 0.3s ease-out' : 'none'
                     }}
                   >
                     {/* Renderiza cards extras para o efeito de peek */}
