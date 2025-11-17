@@ -150,7 +150,7 @@ export function Home() {
     const delta = touchEnd - touchStart;
     const threshold = Math.max(40, slideStep * 0.25);
 
-    if (Math.abs(delta) >= threshold && slideStep) {
+    if (slideStep && Math.abs(delta) >= threshold) {
       setAnimType('manual');
       if (delta < 0) {
         setAnimDirection('left');
@@ -165,21 +165,27 @@ export function Home() {
     }
   };
   // Finaliza animações (manual/auto) ao término da transição
-  const handleTransitionEnd = () => {
+  const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
+    // Garante que só tratamos a transição do contêiner interno, não de filhos
+    if (!innerRef.current || e.target !== innerRef.current) return;
     if (animType === 'none') return;
-    if (animDirection === 'left') {
-      if (featured.length > 0) {
-        setStartIndex((i) => (i + 1) % featured.length);
+
+    // Deferimos para o próximo frame para evitar flicker entre troca e reset do offset
+    requestAnimationFrame(() => {
+      if (animDirection === 'left') {
+        if (featured.length > 0) {
+          setStartIndex((i) => (i + 1) % featured.length);
+        }
+      } else if (animDirection === 'right') {
+        if (featured.length > 0) {
+          setStartIndex((i) => (i - 1 + featured.length) % featured.length);
+        }
       }
-    } else if (animDirection === 'right') {
-      if (featured.length > 0) {
-        setStartIndex((i) => (i - 1 + featured.length) % featured.length);
-      }
-    }
-    setDragOffset(0);
-    setAnimType('none');
-    setAnimDirection(null);
-    resetAutoPlay();
+      setDragOffset(0);
+      setAnimType('none');
+      setAnimDirection(null);
+      resetAutoPlay();
+    });
   };
 
   // Estado para controlar a imagem atual do carrossel
@@ -474,12 +480,13 @@ export function Home() {
           <div className="relative lg:hidden" ref={carouselRef}>
             {featured.length > 0 && (
               <div className="overflow-hidden">
-                <div
-                  className="swipe-container"
-                  onTouchStart={handleTouchStart}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                >
+                  <div
+                    className="swipe-container"
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    style={{ touchAction: 'pan-y' }}
+                  >
                   <div
                     className="flex gap-6 sm:gap-8"
                     ref={innerRef}
