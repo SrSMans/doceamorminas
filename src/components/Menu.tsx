@@ -153,9 +153,6 @@ export function Menu() {
             </h1>
             <p className="text-lg sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
               Descubra nossa seleção de doces artesanais, feitos com amor e os melhores ingredientes
-              <span className="block mt-4 sm:mt-6 text-base sm:text-base md:text-lg text-gray-600 md:hidden">
-                Toque nas fotos dos doces para ver a descrição
-              </span>
             </p>
 
           </div>
@@ -247,8 +244,8 @@ export function Menu() {
                       {/* Description - ALWAYS visible on mobile, disappears with zoom in on click, reappears with zoom out on second click */}
                       <div className={`overflow-hidden transition-all duration-500 ease-out order-2 ${
                         activeProduct === product._id 
-                          ? 'md:max-h-40 md:opacity-100 md:transform md:translate-y-0 max-h-0 opacity-0 scale-110' 
-                          : 'md:max-h-0 md:opacity-0 md:transform md:translate-y-4 max-h-40 opacity-100 scale-100'
+                          ? 'max-h-40 opacity-100 transform translate-y-0' 
+                          : 'max-h-0 opacity-0 transform translate-y-4'
                       }`}>
                         <p className="text-white/90 text-sm sm:text-base md:text-lg leading-relaxed backdrop-blur-sm bg-black/20 rounded-lg p-2 sm:p-3">
                           {product.description}
@@ -258,8 +255,8 @@ export function Menu() {
                       {/* Title - above description when visible, moves down when hidden on mobile */}
                       <h3 className={`text-lg sm:text-xl md:text-2xl font-semibold text-white mb-2 sm:mb-3 transition-all duration-500 order-1 ${
                         activeProduct === product._id 
-                          ? 'transform translate-y-16 md:transform md:translate-y-0 md:text-shadow-lg' 
-                          : 'transform translate-y-0 md:transform md:translate-y-2'
+                          ? 'transform translate-y-0 text-shadow-lg' 
+                          : 'transform translate-y-2'
                       }`} style={{
                         textShadow: activeProduct === product._id 
                           ? '0 0 30px rgba(255, 255, 255, 0.8), 0 0 60px rgba(236, 72, 153, 0.6)' 
@@ -270,7 +267,7 @@ export function Menu() {
                       
                       {/* Decorative line animation */}
                       <div className={`absolute bottom-0 left-8 right-8 h-0.5 bg-pink-400 transition-all duration-700 ${
-                        activeProduct === product._id ? 'md:opacity-100 md:scale-x-100 opacity-0' : 'md:opacity-0 md:scale-x-0 opacity-100'
+                        activeProduct === product._id ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
                       }`}></div>
                     </div>
                   </div>
