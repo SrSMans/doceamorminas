@@ -39,7 +39,7 @@ export function Navigation({ currentPage, setCurrentPage }: NavigationProps) {
       </nav>
 
       {/* Menu hamburguer para mobile */}
-      <div className="md:hidden fixed top-4 right-4 z-50">
+      <div className="md:hidden fixed top-4 right-4 z-50" style={{ maxWidth: 'calc(100vw - 32px)' }}>
         <button
           aria-label="Abrir menu"
           className="flex flex-col justify-center items-center w-12 h-12 bg-white rounded-full shadow-lg border border-pink-200 focus:outline-none"
@@ -51,7 +51,7 @@ export function Navigation({ currentPage, setCurrentPage }: NavigationProps) {
         </button>
         {/* Menu suspenso */}
         {menuOpen && (
-          <div className="absolute right-0 mt-3 w-44 bg-white rounded-xl shadow-2xl border border-pink-100 flex flex-col items-end py-2 animate-fade-in z-50">
+          <div className="absolute right-0 mt-3 w-44 bg-white rounded-xl shadow-2xl border border-pink-100 flex flex-col items-end py-2 animate-fade-in z-50" style={{ maxWidth: 'calc(100vw - 32px)' }}>
             {pageDisplayNames.map((displayName) => (
               <button
                 key={displayName}

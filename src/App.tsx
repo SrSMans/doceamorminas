@@ -31,7 +31,7 @@ export default function App() {
   }, [currentPage]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-white overflow-x-hidden">
       <header className="sticky top-0 z-30 bg-gradient-to-b from-pink-50 to-white p-6 flex justify-between items-center border-b border-pink-100 shadow-sm">
         <h2 className="text-3xl text-pink-600 cursor-pointer" style={{ fontFamily: 'Pacifico' }} onClick={() => {
           if (currentPage === "INICIO") {
@@ -55,7 +55,8 @@ export default function App() {
         href="https://api.whatsapp.com/send/?phone=5532988759023&text=Ol%C3%A1%21+Gostaria+de+fazer+um+pedido.&type=phone_number&app_absent=0"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition-colors"
+        className="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition-colors z-40"
+        style={{ maxWidth: 'calc(100vw - 48px)' }}
       >
         <svg
           className="w-6 h-6"
