@@ -394,7 +394,7 @@ export function Home() {
                 <span className="text-green-600">Amor </span>
                 <span className="text-red-600">Minas</span>
               </h1>
-              <p className="text-xl sm:text-2xl font-semibold text-red-600 mb-6 animate-pulse" style={{ fontFamily: 'Croissant One' }}>
+              <p className="text-base sm:text-2xl font-semibold text-red-600 mb-6 animate-pulse" style={{ fontFamily: 'Croissant One' }}>
                 ✨ Edição Especial de Natal ✨
               </p>
               <p className="text-2xl text-gray-700 mb-8">
